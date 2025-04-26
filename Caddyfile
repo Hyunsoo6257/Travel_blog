@@ -1,0 +1,10 @@
+:3000 {
+    @api path /api/*
+    handle @api {
+        reverse_proxy localhost:4000
+    }
+
+    handle {
+        reverse_proxy localhost:5173
+    }
+}
