@@ -3,12 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import Button from "../components/Button";
+import Comments from "../components/Comments";
 
 function ArticleDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [article, setArticle] = useState(null);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     fetchArticle();
@@ -16,18 +18,12 @@ function ArticleDetail() {
 
   const fetchArticle = async () => {
     try {
-      // 토큰 확인
-      console.log("User token:", user?.token);
-
       const response = await fetch(`/api/articles/${id}`, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
           "Content-Type": "application/json",
         },
       });
-
-      // 응답 상태 확인
-      console.log("Response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -36,7 +32,6 @@ function ArticleDetail() {
       }
 
       const data = await response.json();
-      console.log("Article data:", data);
       setArticle(data);
     } catch (error) {
       console.error("Error fetching article:", error);
@@ -76,12 +71,28 @@ function ArticleDetail() {
     }
   };
 
-  const canEditDelete = article?.canEdit;
-
+  // 댓글 불러오기
   useEffect(() => {
-    console.log("Article:", article);
-    console.log("Can edit:", article?.canEdit);
-  }, [article]);
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/comments/article/${id}`, {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setComments(data);
+        }
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    if (id) {
+      fetchComments();
+    }
+  }, [id, user]);
 
   if (!article) {
     return (
@@ -154,8 +165,8 @@ function ArticleDetail() {
           <p className="mb-4">{article.content}</p>
         </div>
 
-        {/* Edit/Delete Buttons - 맨 아래로 이동하고 가로 정렬 */}
-        {canEditDelete && (
+        {/* Edit/Delete Buttons */}
+        {article.canEdit && (
           <div className="mt-12 flex justify-end space-x-4">
             <Button
               onClick={handleEdit}
@@ -171,6 +182,14 @@ function ArticleDetail() {
             </Button>
           </div>
         )}
+
+        {/* Comments Section */}
+        <Comments
+          user={user}
+          articleId={id}
+          comments={comments}
+          setComments={setComments}
+        />
       </article>
     </div>
   );

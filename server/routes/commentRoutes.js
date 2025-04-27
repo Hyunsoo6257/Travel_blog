@@ -7,7 +7,5 @@ router.get("/article/:articleId", commentController.getComments);
 router.post("/article/:articleId", auth, commentController.createComment);
 router.put("/:id", auth, commentController.updateComment);
 router.delete("/:id", auth, commentController.deleteComment);
-router.post("/:id/like", auth, commentController.likeComment);
-router.delete("/:id/like", auth, commentController.unlikeComment);
 
 export default router;
