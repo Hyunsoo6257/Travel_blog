@@ -3,8 +3,9 @@ const router = express.Router();
 import articleController from "../controllers/articleController.js";
 import auth from "../middleware/auth.js";
 
+router.get("/my-articles", auth, articleController.getMyArticles);
 router.get("/", articleController.getArticles);
-router.get("/:id", articleController.getArticle);
+router.get("/:id", auth, articleController.getArticle);
 router.post("/", auth, articleController.createArticle);
 router.put("/:id", auth, articleController.updateArticle);
 router.delete("/:id", auth, articleController.deleteArticle);

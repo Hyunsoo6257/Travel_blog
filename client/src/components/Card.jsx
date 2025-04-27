@@ -15,10 +15,10 @@ function Card({
   return (
     <div
       onClick={() => navigate(`/article/${id}`)}
-      className="group cursor-pointer"
+      className="group cursor-pointer flex flex-col h-full"
     >
       {/* Main Image */}
-      <div className="aspect-[4/3] overflow-hidden mb-4">
+      <div className="aspect-[4/3] overflow-hidden">
         <img
           src={image}
           alt={title}
@@ -27,8 +27,8 @@ function Card({
       </div>
 
       {/* Content */}
-      <div>
-        <div className="text-xs tracking-[0.2em] text-gray-600 mb-3 font-light">
+      <div className="flex flex-col flex-grow">
+        <div className="text-xs tracking-[0.2em] text-gray-600 mt-4 mb-3 font-light">
           {category.toUpperCase()}
         </div>
 
@@ -36,14 +36,14 @@ function Card({
           {title}
         </h3>
 
-        <p className="text-sm tracking-wide text-gray-600 leading-relaxed mb-4 font-light">
+        <p className="text-sm tracking-wide text-gray-600 leading-relaxed mb-4 font-light flex-grow">
           {description}
         </p>
 
-        {/* Author Info with Profile Image */}
-        <div className="flex items-center space-x-3 border-t border-gray-200 pt-4">
+        {/* Author Info with Profile Image - 항상 하단에 고정 */}
+        <div className="flex items-center space-x-3 border-t border-gray-200 pt-4 mt-auto">
           {/* Profile Image */}
-          <div className="w-7 h-7 rounded-full overflow-hidden bg-[#F7F3EE]">
+          <div className="w-7 h-7 rounded-full overflow-hidden bg-[#F7F3EE] flex-shrink-0">
             {authorImage ? (
               <img
                 src={authorImage}

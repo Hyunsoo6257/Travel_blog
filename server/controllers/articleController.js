@@ -34,14 +34,26 @@ const articleController = {
 
   getArticle: async (req, res) => {
     try {
-      const article = await Article.findById(req.params.id)
-        .populate("author", "name profileImage")
-        .populate("category", "name");
+      const article = await Article.findById(req.params.id).populate(
+        "author",
+        "username userTitle profileImage"
+      );
+
       if (!article) {
         return res.status(404).json({ message: "Article not found" });
       }
-      res.status(200).json(article);
+
+      // 인증된 사용자인 경우에만 canEdit 체크
+      const canEdit = req.user
+        ? req.user.isAdmin || article.author._id.toString() === req.user.id
+        : false;
+
+      res.status(200).json({
+        ...article.toObject(),
+        canEdit,
+      });
     } catch (error) {
+      console.error("Error in getArticle:", error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -73,7 +85,6 @@ const articleController = {
         location: location
           ? {
               name: location.name || "Unknown Location",
-              // 다른 location 관련 필드가 있다면 여기에 추가
             }
           : { name: "Unknown Location" }, // location이 없을 경우 기본값 설정
         author: req.user.id,
@@ -168,6 +179,47 @@ const articleController = {
       res.status(200).json({ message: "Article unsaved successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  },
+
+  getMyArticles: async (req, res) => {
+    try {
+      const { page = 1, limit = 6 } = req.query;
+      const skip = (page - 1) * limit;
+
+      // 사용자 ID 확인
+      if (!req.user || !req.user.id) {
+        console.error("User ID not found in request");
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      console.log("Fetching articles for user:", req.user.id);
+
+      const articles = await Article.find({ author: req.user.id })
+        .populate("author", "username userTitle profileImage")
+        .sort("-createdAt")
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      console.log("Found articles:", articles);
+
+      const total = await Article.countDocuments({ author: req.user.id });
+
+      res.status(200).json({
+        articles,
+        total,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / limit),
+      });
+    } catch (error) {
+      // 자세한 에러 로깅
+      console.error("Error in getMyArticles:", error);
+      console.error("Error stack:", error.stack);
+      res.status(500).json({
+        message: "Failed to fetch articles",
+        error: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      });
     }
   },
 };

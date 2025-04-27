@@ -52,7 +52,7 @@ function Navbar() {
                       />
                     ) : (
                       <span className="text-xs font-serif text-gray-600">
-                        {user.name?.charAt(0).toUpperCase()}
+                        {user.username?.charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>
@@ -60,6 +60,16 @@ function Navbar() {
 
                 {isOpen && (
                   <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-200 shadow-sm">
+                    {/* User Info Section */}
+                    <div className="px-6 py-4 border-b border-gray-100">
+                      <div className="font-serif text-sm mb-1">
+                        {user.username}
+                      </div>
+                      <div className="text-xs text-gray-500 font-light">
+                        {user.email}
+                      </div>
+                    </div>
+
                     <div className="py-3 divide-y divide-gray-100">
                       <div className="pb-3">
                         <Link to="/create-article" className={menuItemClass}>

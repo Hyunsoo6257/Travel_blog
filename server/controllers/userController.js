@@ -69,10 +69,15 @@ const userController = {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      // Create token
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      // Create token - isAdmin 정보 추가
+      const token = jwt.sign(
+        {
+          id: user._id,
+          isAdmin: user.isAdmin, // isAdmin 정보를 토큰에 포함
+        },
+        process.env.JWT_SECRET
+      );
 
-      // token과 함께 필요한 user 정보도 보내기
       res.json({
         token,
         username: user.username,

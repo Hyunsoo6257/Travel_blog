@@ -1,6 +1,6 @@
 const UserTable = ({ users, onDelete }) => {
   return (
-    <div>
+    <div className="overflow-x-auto">
       <table className="w-full">
         <TableHeader />
         <tbody className="divide-y divide-gray-100">
@@ -25,7 +25,7 @@ const TableHeader = () => (
       <th className="text-left py-6 text-xs tracking-[0.2em] font-light text-gray-500">
         ROLE
       </th>
-      <th className="text-left py-6 text-xs tracking-[0.2em] font-light text-gray-500">
+      <th className="text-right py-6 text-xs tracking-[0.2em] font-light text-gray-500">
         ACTIONS
       </th>
     </tr>
@@ -33,47 +33,46 @@ const TableHeader = () => (
 );
 
 const TableRow = ({ user, onDelete }) => (
-  <tr className="hover:bg-gray-50 transition-colors">
-    <td className="py-5 text-sm font-light">
+  <tr className="hover:bg-[#F7F3EE] transition-colors">
+    <td className="py-5">
       <div className="flex items-center gap-3">
-        {user.profileImage ? (
-          <img
-            src={user.profileImage}
-            alt={user.username}
-            className="w-8 h-8 rounded-full object-cover"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-            <span className="text-xs text-gray-500">
+        <div className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center overflow-hidden">
+          {user.profileImage ? (
+            <img
+              src={user.profileImage}
+              alt={user.username}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-xs font-serif text-gray-500">
               {user.username.charAt(0).toUpperCase()}
             </span>
-          </div>
-        )}
-        {user.username}
+          )}
+        </div>
+        <span className="text-sm font-light">{user.username}</span>
       </div>
     </td>
     <td className="py-5 text-sm font-light text-gray-600">{user.email}</td>
-    <td className="py-5 text-sm font-light">
+    <td className="py-5">
       {user.isAdmin ? (
-        <span className="text-xs tracking-wider bg-black text-white px-2 py-1">
+        <span className="text-xs tracking-[0.2em] bg-black text-white px-3 py-1 rounded-full">
           ADMIN
         </span>
       ) : (
-        <span className="text-xs tracking-wider text-gray-500">USER</span>
+        <span className="text-xs tracking-[0.2em] text-gray-500 font-light">
+          USER
+        </span>
       )}
     </td>
-    <td className="py-5">
+    <td className="py-5 text-right">
       {user.isAdmin ? (
-        <button
-          disabled
-          className="text-gray-400 text-xs tracking-wider cursor-not-allowed"
-        >
+        <span className="text-xs tracking-[0.2em] text-gray-400 font-light">
           PROTECTED
-        </button>
+        </span>
       ) : (
         <button
           onClick={() => onDelete(user._id)}
-          className="text-red-500 hover:text-red-700 text-xs tracking-wider"
+          className="text-xs tracking-[0.2em] text-red-500 hover:text-red-700 font-light transition-colors"
         >
           DELETE
         </button>

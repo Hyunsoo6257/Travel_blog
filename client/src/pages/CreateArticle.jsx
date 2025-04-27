@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import Input from "../components/Input";
@@ -7,15 +7,18 @@ import Button from "../components/Button";
 
 function CreateArticle() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [imageError, setImageError] = useState("");
+  const isEditing = location.state?.isEditing || false;
+  const editData = location.state?.articleData;
 
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     category: "",
     image: "",
-    location: "", // Optional field
+    location: "",
   });
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -25,6 +28,20 @@ function CreateArticle() {
       navigate("/login");
     }
   }, [navigate, user]);
+
+  // 편집 모드일 경우 기존 데이터 로드
+  useEffect(() => {
+    if (isEditing && editData) {
+      setFormData({
+        title: editData.title,
+        content: editData.content,
+        category: editData.category,
+        image: editData.image,
+        location: editData.location?.name || "",
+      });
+      setImagePreview(editData.image);
+    }
+  }, [isEditing, editData]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -61,8 +78,12 @@ function CreateArticle() {
         delete submitData.location;
       }
 
-      const response = await fetch("/api/articles", {
-        method: "POST",
+      const url = isEditing ? `/api/articles/${editData._id}` : "/api/articles";
+
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
@@ -71,14 +92,24 @@ function CreateArticle() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create article");
+        throw new Error(
+          isEditing ? "Failed to update article" : "Failed to create article"
+        );
       }
 
       const data = await response.json();
       navigate(`/article/${data._id}`);
     } catch (error) {
-      console.error("Error creating article:", error);
-      alert(error.message || "Failed to create article. Please try again.");
+      console.error(
+        isEditing ? "Error updating article:" : "Error creating article:",
+        error
+      );
+      alert(
+        error.message ||
+          `Failed to ${
+            isEditing ? "update" : "create"
+          } article. Please try again.`
+      );
     }
   };
 
@@ -89,9 +120,11 @@ function CreateArticle() {
         <div className="max-w-3xl mx-auto px-4">
           {/* Header */}
           <div className="text-xs tracking-[0.2em] text-gray-500 mb-2 font-light">
-            NEW STORY
+            {isEditing ? "EDIT STORY" : "NEW STORY"}
           </div>
-          <h2 className="font-serif text-3xl mb-12">Create Your Story</h2>
+          <h2 className="font-serif text-3xl mb-12">
+            {isEditing ? "Edit Your Story" : "Create Your Story"}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Category Selection */}
@@ -173,7 +206,7 @@ function CreateArticle() {
                     file:bg-gray-50 file:text-gray-700
                     hover:file:bg-gray-100
                     file:tracking-[0.2em]"
-                  required
+                  required={!isEditing}
                 />
                 {imageError && (
                   <p className="text-red-500 text-sm mt-1">{imageError}</p>
@@ -204,7 +237,9 @@ function CreateArticle() {
 
             {/* Submit Button */}
             <div className="pt-4">
-              <Button type="submit">PUBLISH STORY</Button>
+              <Button type="submit">
+                {isEditing ? "UPDATE STORY" : "PUBLISH STORY"}
+              </Button>
             </div>
           </form>
         </div>
