@@ -81,6 +81,7 @@ const userController = {
       res.json({
         token,
         username: user.username,
+        id: user._id,
         profileImage: user.profileImage || "",
         userTitle: user.userTitle || "",
         isAdmin: user.isAdmin,

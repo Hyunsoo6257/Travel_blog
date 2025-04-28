@@ -44,13 +44,13 @@ const articleController = {
       }
 
       // 인증된 사용자인 경우에만 canEdit 체크
-      const canEdit = req.user
-        ? req.user.isAdmin || article.author._id.toString() === req.user.id
-        : false;
+      // const canEdit = req.user
+      //   ? req.user.isAdmin || article.author._id.toString() === req.user.id
+      //   : false;
 
       res.status(200).json({
         ...article.toObject(),
-        canEdit,
+        // canEdit,
       });
     } catch (error) {
       console.error("Error in getArticle:", error);

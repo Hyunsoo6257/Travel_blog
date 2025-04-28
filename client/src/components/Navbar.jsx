@@ -83,9 +83,9 @@ function Navbar() {
                         <Link to="/my-articles" className={menuItemClass}>
                           MY ARTICLES
                         </Link>
-                        <Link to="/saved-articles" className={menuItemClass}>
+                        {/* <Link to="/saved-articles" className={menuItemClass}>
                           SAVED ARTICLES
-                        </Link>
+                        </Link> */}
                         {user.isAdmin && (
                           <Link to="/admin/users" className={menuItemClass}>
                             MANAGE USERS

@@ -21,13 +21,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/create-article" element={<CreateArticle />} />
           <Route path="/article/:id" element={<ArticleDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/my-articles" element={<MyArticles />} />
-          <Route path="/saved-articles" element={<SavedArticles />} />
+          {/* <Route path="/saved-articles" element={<SavedArticles />} /> */}
           <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
         </Routes>
       </Router>
     </AuthProvider>

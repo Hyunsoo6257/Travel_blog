@@ -11,11 +11,9 @@ function ArticleDetail() {
   const { user } = useAuth();
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
+  const [canEdit, setCanEdit] = useState(false);
 
-  useEffect(() => {
-    fetchArticle();
-  }, [id]);
-
+  // article 데이터 가져오기
   const fetchArticle = async () => {
     try {
       const response = await fetch(`/api/articles/${id}`, {
@@ -25,18 +23,42 @@ function ArticleDetail() {
         },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Server error:", errorData);
-        throw new Error(errorData.message || "Failed to fetch article");
-      }
-
       const data = await response.json();
+      console.log("Fetched Article Data:", data);
       setArticle(data);
     } catch (error) {
       console.error("Error fetching article:", error);
     }
   };
+
+  // article 데이터 불러오기
+  useEffect(() => {
+    fetchArticle();
+  }, [id]);
+
+  // canEdit 계산
+  useEffect(() => {
+    console.log("=== canEdit 계산 ===");
+    console.log("User:", user);
+    console.log("Article:", article);
+    console.log("User ID:", user?.id);
+    console.log("Author ID:", article?.author?._id);
+    console.log("Is Admin:", user?.isAdmin);
+
+    if (!user || !article) {
+      console.log("User 또는 Article이 없음");
+      setCanEdit(false);
+      return;
+    }
+
+    const isAuthor = user.id === article.author._id;
+    console.log("Is Author:", isAuthor);
+
+    const canEditValue = user.isAdmin || isAuthor;
+    console.log("Final canEdit value:", canEditValue);
+
+    setCanEdit(canEditValue);
+  }, [user, article]);
 
   const handleEdit = () => {
     navigate(`/create-article`, {
@@ -114,12 +136,10 @@ function ArticleDetail() {
         <div className="text-xs tracking-[0.2em] text-gray-600 font-light mb-4">
           {article.category?.toUpperCase() || "UNCATEGORIZED"}
         </div>
-
         {/* Title */}
         <h1 className="font-serif text-4xl font-bold leading-tight mb-8">
           {article.title}
         </h1>
-
         {/* Author Info */}
         <div className="flex items-center mb-10 border-t border-gray-200 pt-4">
           <div className="w-7 h-7 bg-[#F5F5F8] rounded-full overflow-hidden">
@@ -150,7 +170,6 @@ function ArticleDetail() {
             </div>
           </div>
         </div>
-
         {/* Featured Image */}
         <div className="aspect-[16/9] bg-gray-100 mb-10 overflow-hidden">
           <img
@@ -159,14 +178,13 @@ function ArticleDetail() {
             className="w-full h-full object-cover"
           />
         </div>
-
         {/* Content */}
         <div className="font-light text-base leading-relaxed tracking-wide">
           <p className="mb-4">{article.content}</p>
         </div>
-
         {/* Edit/Delete Buttons */}
-        {article.canEdit && (
+        {console.log("Rendering - canEdit value:", canEdit)}
+        {canEdit && (
           <div className="mt-12 flex justify-end space-x-4">
             <Button
               onClick={handleEdit}
@@ -182,7 +200,6 @@ function ArticleDetail() {
             </Button>
           </div>
         )}
-
         {/* Comments Section */}
         <Comments
           user={user}

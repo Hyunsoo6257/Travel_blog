@@ -19,6 +19,11 @@ const CommentItem = ({ comment, currentUser, setComments }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
 
+  // 수정/삭제 권한 확인
+  const canModifyComment =
+    currentUser &&
+    (currentUser.isAdmin || currentUser.id === comment.author._id);
+
   const handleEdit = async () => {
     try {
       const response = await fetch(`/api/comments/${comment._id}`, {
@@ -88,7 +93,7 @@ const CommentItem = ({ comment, currentUser, setComments }) => {
             </span>
           </div>
         </div>
-        {comment.canEdit && (
+        {canModifyComment && (
           <div className="flex gap-2">
             <button
               onClick={() => setIsEditing(!isEditing)}
